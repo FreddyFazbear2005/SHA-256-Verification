@@ -1,0 +1,330 @@
+[design]
+vcode = "demo/vcode.f"
+define = ["RTL_SIM"]
+
+[compilation]
+background_compilation = true
+background_compilation_threads = 4
+background_compilation_debounce_ms = 1000
+nice_value = 10
+log_timing = false
+
+[lint]
+enable = true
+
+###############################################################################
+# Naming Rules
+###############################################################################
+
+[lint.naming]
+enable = true
+severity = "warning"
+
+module_pattern = "^[a-z][a-z0-9_]*$"
+
+input_port_pattern = "^i_[a-z0-9_]*$"
+output_port_pattern = "^o_[a-z0-9_]*$"
+
+signal_pattern = "^(w_|n_|r_)?[a-z][a-z0-9_]*$"
+
+interface_pattern = ".*_if$"
+struct_pattern = ".*_t$"
+union_pattern = ".*_u$"
+enum_pattern = ".*_e$"
+
+parameter_pattern = "^P_[A-Z0-9_]*$"
+localparam_pattern = "^LP_[A-Z0-9_]*$"
+
+register_pattern = "^r_[a-z0-9_]*$"
+
+check_module_filename = true
+check_package_filename = true
+
+###############################################################################
+# Module Rules
+###############################################################################
+
+[lint.module]
+enable = true
+severity = "warning"
+one_module_per_file = true
+
+###############################################################################
+# Instance Rules
+###############################################################################
+
+[lint.instance]
+enable = true
+severity = "warning"
+
+module_instantiation_style = "named"
+stale_instance_diagnostic = true
+
+###############################################################################
+# Statement Rules
+###############################################################################
+
+[lint.statement]
+enable = true
+severity = "error"
+
+no_raw_always = true
+blocking_nonblocking_assignments = true
+latch_inference_detection = true
+case_missing_default = true
+explicit_begin = true
+
+###############################################################################
+# Function Rules
+###############################################################################
+
+[lint.function]
+enable = true
+severity = "warning"
+
+functions_automatic = true
+function_call_style = "named"
+explicit_function_lifetime = true
+explicit_task_lifetime = true
+
+###############################################################################
+# Style
+###############################################################################
+
+[lint.style]
+trailing_whitespace = true
+
+###############################################################################
+# RTL Tree
+###############################################################################
+
+[rtltree]
+show_instance_name = true
+show_file = true
+
+###############################################################################
+# Formatter
+###############################################################################
+
+[format]
+indent_size = 4
+blank_lines_between_items = 1
+default_indent_level_inside_outmost_block = 0
+tab_align = false
+enable_format_on_save = true
+
+format_off_comment_pattern = '//\s*verilog[-_]format\s*:\s*off\b'
+format_on_comment_pattern = '//\s*verilog[-_]format\s*:\s*on\b'
+
+log_path = ""
+
+###############################################################################
+# Spacing
+###############################################################################
+
+[format.spacing]
+
+control_keyword_space = true
+
+space_inside_parens = false
+space_inside_dimension_brackets = false
+
+binary_operator_spacing = "both"
+dimension_binary_operator_spacing = "none"
+
+semicolon_spacing = "both"
+
+range_colon_spacing = "none"
+indexed_part_select_spacing = "none"
+
+procedural_event_control_at_spacing = "both"
+space_inside_event_control_parens = true
+
+assignment_operator_spacing = "both"
+
+###############################################################################
+# Statements
+###############################################################################
+
+[format.statement]
+
+align = true
+align_adaptive = true
+
+lhs_min_width = 12
+
+begin_newline = false
+wrap_end_else_clauses = true
+
+###############################################################################
+# Port Declaration
+###############################################################################
+
+[format.port_declaration]
+
+align = true
+align_adaptive = true
+
+section1_min_width = 10
+section2_min_width = 12
+section3_min_width = 12
+section4_min_width = 14
+section5_min_width = 16
+
+###############################################################################
+# Variable Declaration
+###############################################################################
+
+[format.var_declaration]
+
+align = true
+align_adaptive = true
+
+section1_min_width = 20
+section2_min_width = 20
+section3_min_width = 20
+section4_min_width = 20
+
+###############################################################################
+# Function Calls
+###############################################################################
+
+[format.function_call]
+
+break_policy = "auto"
+
+line_length = 100
+arg_count = 4
+
+layout = "hanging"
+
+space_before_paren = false
+space_inside_paren = false
+
+###############################################################################
+# Function Declaration
+###############################################################################
+
+[format.function_declaration]
+
+layout = "block"
+
+line_length = 100
+
+space_before_paren = false
+
+###############################################################################
+# Macros
+###############################################################################
+
+[format.macros]
+
+object_like_expr = []
+
+function_like_expr = [
+    "dv_fatal"
+]
+
+statement_like = []
+
+declaration_like = [
+    "DV_ALERT_IF_CONNECT",
+]
+
+control_flow_like = []
+
+block_begin_like = []
+block_end_like = []
+
+whitespace_sensitive = []
+
+###############################################################################
+# Modules
+###############################################################################
+
+[format.module]
+
+parameter_layout = "block"
+
+non_ansi_port_per_line_enabled = true
+non_ansi_port_per_line = 3
+
+non_ansi_port_max_line_length_enabled = false
+non_ansi_port_max_line_length = 18
+
+###############################################################################
+# Enum
+###############################################################################
+
+[format.enum_declaration]
+
+align = true
+align_adaptive = true
+
+enum_name_min_width = 12
+enum_value_min_width = 12
+
+###############################################################################
+# Modport
+###############################################################################
+
+[format.modport]
+
+align = true
+align_adaptive = true
+
+direction_min_width = 15
+signal_min_width = 12
+
+###############################################################################
+# Instance Formatting
+###############################################################################
+
+[format.instance]
+
+align = true
+align_adaptive = true
+
+port_indent_level = 1
+
+instance_port_name_width = 20
+instance_port_between_paren_width = 32
+
+###############################################################################
+# Inlay Hints
+###############################################################################
+
+[inlay_hint]
+enable = true
+
+###############################################################################
+# AutoFF
+###############################################################################
+
+[autoff]
+register_pattern = "^r_"
+
+###############################################################################
+# AutoFunc
+###############################################################################
+
+[autofunc]
+
+indent_size = 4
+use_named_arguments = true
+
+###############################################################################
+# AutoArg
+###############################################################################
+
+[autoarg]
+autoarg_on_save = true
+
+###############################################################################
+# AutoWire
+###############################################################################
+
+[autowire]
+
+group_by_instance = true
+sort_by_name = true

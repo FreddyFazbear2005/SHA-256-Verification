@@ -1,0 +1,3 @@
+-v /mnt/c/Users/Sanjay Rajnarayanan/Documents/System_Verilog_Practice/SHA/sha256_pkg.sv
++incdir+/mnt/c/Users/Sanjay Rajnarayanan/Documents/System_Verilog_Practice/SHA
++incdir+/mnt/c/Users/Sanjay Rajnarayanan/Documents/System_Verilog_Practice/SHA
