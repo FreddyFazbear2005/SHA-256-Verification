@@ -111,7 +111,7 @@ indent_size = 4
 blank_lines_between_items = 1
 default_indent_level_inside_outmost_block = 0
 tab_align = false
-enable_format_on_save = true
+enable_format_on_save = false
 
 format_off_comment_pattern = '//\s*verilog[-_]format\s*:\s*off\b'
 format_on_comment_pattern = '//\s*verilog[-_]format\s*:\s*on\b'

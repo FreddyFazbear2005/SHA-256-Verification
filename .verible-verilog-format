@@ -1,0 +1,51 @@
+# ============================================================================
+# Verible Verilog Formatter Configuration
+# ============================================================================
+
+# Number of spaces per indentation level.
+--indentation_spaces=4
+
+# Maximum allowed line length before wrapping.
+--column_limit=100
+
+# Attempt to wrap long lines instead of letting them exceed the column limit.
+--try_wrap_long_lines=true
+
+# Indent named parameter lists.
+--named_parameter_indentation=indent
+
+# Indent module port declarations.
+--port_declarations_indentation=indent
+
+# Align consecutive port declarations.
+--port_declarations_alignment=align
+
+# Align formal parameter declarations.
+--formal_parameters_alignment=align
+
+# Align named parameter assignments.
+--named_parameter_alignment=align
+
+# Align named port connections.
+--named_port_alignment=align
+
+# Align assignment statements when possible.
+--assignment_statement_alignment=align
+
+# Indent class member variables.
+--class_member_variable_alignment=align
+
+# Indent enum assignments.
+--enum_assignment_statement_alignment=align
+
+# Align distribution items inside constraint blocks.
+--distribution_items_alignment=align
+
+# Align case items.
+--case_items_alignment=align
+
+# Wrap formal parameter lists if needed.
+--formal_parameters_indentation=indent
+
+# Wrap named port connections if needed.
+--named_port_indentation=indent
