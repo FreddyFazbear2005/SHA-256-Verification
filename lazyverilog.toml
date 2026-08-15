@@ -1,5 +1,5 @@
 [design]
-vcode = "demo/vcode.f"
+vcode = "vcode.f"
 define = ["RTL_SIM"]
 
 [compilation]
