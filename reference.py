@@ -65,6 +65,28 @@ def apply_sha256_padding(message: bytes) -> bytes:
 
     return bytes(padded_message)
 
+def generate_message_schedule(message_block: bytes) -> list[int]:
+    message_schedule = []
+    
+    for word_index in range(16):
+        message_word = int.from_bytes(
+            message_block[word_index * 4 : (word_index + 1) * 4],
+            "big"
+        )
+        message_schedule.append(message_word)
+
+    for word_index in range(16, 64):
+        schedule_word = (
+            small_sigma1(message_schedule[word_index - 2])
+            + message_schedule[word_index - 7]
+            + small_sigma0(message_schedule[word_index - 15])
+            + message_schedule[word_index - 16]
+        ) & 0xFFFFFFFF
+
+        message_schedule.append(schedule_word)
+
+    return message_schedule
+
 def compute_sha256_hash(message: bytes) -> str:
     padded_message = apply_sha256_padding(message)
 
@@ -75,23 +97,7 @@ def compute_sha256_hash(message: bytes) -> str:
     for block_offset in range(0,len(padded_message),64):
         message_block = padded_message[block_offset:block_offset+64]
          
-        message_schedule = []
-
-        for word_index in range(16):
-            message_word = int.from_bytes(message_block[word_index*4:(word_index+1)*4],"big")
-
-            message_schedule.append(message_word)
-
-        "Remaining 48 words"
-
-        for word_index in range(16,64):
-            schedule_word = (
-                small_sigma1(message_schedule[word_index-2])
-                + message_schedule[word_index-7]
-                + small_sigma0(message_schedule[word_index-15])
-                + message_schedule[word_index-16]
-            ) & 0xFFFFFFFF
-            message_schedule.append(schedule_word)
+        message_schedule = generate_message_schedule(message_block)
 
         a,b,c,d,e,f,g,h = hash_state
 
@@ -131,22 +137,54 @@ def compute_sha256_hash(message: bytes) -> str:
 
     return "".join(f"{value:08x}" for value in hash_state)
 
+def generate_test_vectors(number_of_vectors: int):
+    import random 
+
+    with open("message_schedule.txt","w") as schedule_file, \
+        open("expected_digest.txt","w") as digest_file:
+
+        for vector_index in range(number_of_vectors):
+            message_length = random.randint(0,55)
+            message = bytes(
+                random.getrandbits(8)
+                for _ in range(message_length)
+            )
+            padded_message = apply_sha256_padding(message)
+
+            assert len(padded_message) == 64 
+
+            message_schedule = generate_message_schedule(padded_message)
+
+            expected_digest = compute_sha256_hash(message)
+
+            import hashlib 
+
+            reference_digest = hashlib.sha256(message).hexdigest()
+
+            assert expected_digest == reference_digest
+
+            schedule_file.write(
+                " ".join(
+                    f"{word:08x}"
+                    for word in message_schedule
+                )
+                + "\n"
+            )
+
+            # One digest per line
+            digest_file.write(
+                expected_digest + "\n"
+            )
+
+
 
 def main():
-    message = input("Enter message: ").encode("utf-8")
+    number_of_vectors = 1000
+    generate_test_vectors(number_of_vectors)
 
-    hash_digest = compute_sha256_hash(message)
-
-    print("\nSHA-256 Digest")
-    print("-------------------------")
-    print(hash_digest)
-
-    import hashlib 
-    reference_digest = hashlib.sha256(message).hexdigest()
-    
-    print("\nSHA-256 Digest from library")
-    print("-------------------------")
-    print(reference_digest)
+    print(f"Generated {number_of_vectors} SHA-256 verification vectors.")
+    print("  message_schedule.txt")
+    print("  expected_digest.txt")
 
 
 if __name__ == "__main__":

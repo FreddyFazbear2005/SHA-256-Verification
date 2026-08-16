@@ -29,7 +29,47 @@ package compression_tb_pkg;
 
     task automatic run();
       compression_transaction transaction;
-      transaction = new();
+
+      int schedule_file;
+      int digest_file;
+      int status;
+      int unsigned vector_count = 0;
+
+      schedule_file = $fopen("message_schedule.txt","r");
+      digest_file = $fopen("expected_digest.txt","r");
+
+      if(schedule_file == 0) begin
+        $fatal(1,"Could not open message_schedule.txt");
+      end
+      if(digest_file == 0) begin
+        $fatal(1,"Could not open expected_digest.txt");
+      end
+
+      forever begin
+        transaction = new();
+
+        for(int i = 0; i < 64; i++) begin
+          status = $fscanf(schedule_file,"%h",transaction.message_schedule[i]);
+          if(status != 1) begin
+            $fclose(schedule_file);
+            $fclose(digest_file);
+            $display("Generated %0d test vectors.",vector_count);
+            return;
+          end
+        end
+
+        status = $fscanf(digest_file,"%h",transaction.expected_digest);
+
+        if(status != 1) begin
+          $fclose(schedule_file);
+          $fclose(digest_file);
+          $fatal(1,"Failed to read expected digest");
+        end
+
+        vector_count++;
+        gen_to_drv.put(transaction);
+        expected_mb.put(transaction);
+      end
     endtask
   endclass
 
@@ -46,6 +86,7 @@ package compression_tb_pkg;
 
     task automatic run();
       compression_transaction transaction;
+      reset_dut();
       forever begin
         gen_to_drv.get(transaction);
         drive_transaction(.transaction(transaction));
@@ -55,6 +96,28 @@ package compression_tb_pkg;
     task automatic drive_transaction(
       compression_transaction transaction
       );
+      vif.i_reset = 1'b0;
+      vif.i_start = 1'b0;
+
+      for(int i = 0; i < 64; i = i + 1) begin
+        vif.i_message_schedule[i] = transaction.message_schedule[i];
+      end
+
+      @(posedge vif.i_clk);
+      vif.i_start = 1'b1;
+
+      @(posedge vif.i_clk);
+      vif.i_start = 1'b0;
+    endtask
+
+    task automatic reset_dut();
+      vif.i_reset = 1'b1;
+      vif.i_start = 1'b0;
+
+      @(posedge vif.i_clk);
+      @(posedge vif.i_clk);
+
+      vif.i_reset = 1'b0;
     endtask
   endclass
   class compression_monitor;
@@ -72,7 +135,13 @@ package compression_tb_pkg;
     task automatic run();
       compression_result result;
       forever begin
-        //Later
+        @(posedge vif.i_clk);
+
+        if(vif.o_done) begin
+          result = new();
+          result.actual_digest = vif.o_digest;
+          actual_mb.put(result);
+        end
       end
     endtask
   endclass
@@ -94,7 +163,14 @@ package compression_tb_pkg;
       forever begin
         expected_mb.get(expected);
         actual_mb.get(actual);
-        //To do later
+
+        if(expected.expected_digest === actual.actual_digest) begin
+          $display("PASS");
+        end else begin
+          $display("FAIL");
+          expected.display();
+          actual.display();
+        end
       end
     endtask
   endclass
