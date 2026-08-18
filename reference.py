@@ -139,6 +139,7 @@ def compute_sha256_hash(message: bytes) -> str:
 
 def generate_test_vectors(number_of_vectors: int):
     import random 
+    random.seed(123)
 
     with open("message_schedule.txt","w") as schedule_file, \
         open("expected_digest.txt","w") as digest_file:

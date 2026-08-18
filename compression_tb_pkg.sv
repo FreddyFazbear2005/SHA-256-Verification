@@ -103,19 +103,24 @@ package compression_tb_pkg;
         vif.i_message_schedule[i] = transaction.message_schedule[i];
       end
 
-      @(posedge vif.i_clk);
+      @(negedge vif.i_clk);
       vif.i_start = 1'b1;
 
-      @(posedge vif.i_clk);
+      @(negedge vif.i_clk);
       vif.i_start = 1'b0;
+      
+
+      @(posedge vif.o_done);
+      @(posedge vif.i_clk);
+
     endtask
 
     task automatic reset_dut();
       vif.i_reset = 1'b1;
       vif.i_start = 1'b0;
 
-      @(posedge vif.i_clk);
-      @(posedge vif.i_clk);
+      @(negedge vif.i_clk);
+      @(negedge vif.i_clk);
 
       vif.i_reset = 1'b0;
     endtask
@@ -135,13 +140,10 @@ package compression_tb_pkg;
     task automatic run();
       compression_result result;
       forever begin
-        @(posedge vif.i_clk);
-
-        if(vif.o_done) begin
-          result = new();
-          result.actual_digest = vif.o_digest;
-          actual_mb.put(result);
-        end
+        @(posedge vif.o_done)
+        result = new();
+        result.actual_digest = vif.o_digest;
+        actual_mb.put(result);
       end
     endtask
   endclass
@@ -149,29 +151,55 @@ package compression_tb_pkg;
   class compression_scoreboard;
     mailbox #(compression_transaction) expected_mb;
     mailbox #(compression_result) actual_mb;
+
+    int unsigned pass_count = 0;
+    int unsigned fail_count = 0;
+    int unsigned expected_vectors;
+
     function automatic new(
       mailbox #(compression_transaction) expected_mb,
-      mailbox #(compression_result) actual_mb
+      mailbox #(compression_result) actual_mb,
+      int unsigned expected_vectors
       );
 
       this.expected_mb = expected_mb;
       this.actual_mb = actual_mb;
+      this.expected_vectors = expected_vectors;
     endfunction
     task automatic run();
       compression_transaction expected;
       compression_result actual;
-      forever begin
+      $display("SCOREBOARD: STARTED");
+      for(int unsigned i = 0; i < expected_vectors; i++) begin
         expected_mb.get(expected);
         actual_mb.get(actual);
 
         if(expected.expected_digest === actual.actual_digest) begin
-          $display("PASS");
+          pass_count++;
         end else begin
+          fail_count++;
           $display("FAIL");
           expected.display();
           actual.display();
         end
       end
+    $display("");
+    $display("========================================");
+    $display("       SHA-256 VERIFICATION SUMMARY");
+    $display("========================================");
+    $display("Vectors Tested : %0d", expected_vectors);
+    $display("Passed         : %0d", pass_count);
+    $display("Failed         : %0d", fail_count);
+    $display("========================================");
+
+    if(fail_count == 0) begin
+      $display("SHA-256 VERIFICATION PASSED");
+      $finish;
+    end
+    else begin
+      $fatal(1, "SHA-256 VERIFICATION FAILED");
+    end
+
     endtask
   endclass
 
@@ -198,7 +226,7 @@ package compression_tb_pkg;
       generator = new(.gen_to_drv(gen_to_drv),.expected_mb(expected_mb));
       driver = new(.vif(vif),.gen_to_drv(gen_to_drv));
       monitor = new(.vif(vif),.actual_mb(actual_mb));
-      scoreboard = new(.expected_mb(expected_mb),.actual_mb(actual_mb));
+      scoreboard = new(.expected_mb(expected_mb),.actual_mb(actual_mb),.expected_vectors(1000));
     endfunction
 
     task automatic run();
