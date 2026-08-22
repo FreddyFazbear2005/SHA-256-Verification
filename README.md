@@ -46,7 +46,7 @@ The SHA-256 compression engine consists of:
                  +----------+-----------+
                             |
                             +----> Next Round
-
+```
 ## Final Results
 
 | Metric | Result |
