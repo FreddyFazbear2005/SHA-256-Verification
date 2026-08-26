@@ -58,6 +58,6 @@ The SHA-256 compression engine consists of:
 | Flip-Flops | **2,582** |
 | BRAM | **0** |
 | DSP | **0** |
-| Post-route Fmax | **85.7 MHz** |
-| Core Throughput | **664 Mbps** |
-| Estimated On-Chip Power | **98 mW** |
+| Post-route Fmax | **82.3 MHz** |
+| Core Throughput | **639 Mbps** |
+| Estimated On-Chip Power | **90 mW** |
