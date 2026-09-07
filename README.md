@@ -59,5 +59,5 @@ The SHA-256 compression engine consists of:
 | BRAM | **0** |
 | DSP | **0** |
 | Post-route Fmax | **82.3 MHz** |
-| Core Throughput | **639 Mbps** |
+| Core Throughput | **629 Mbps** |
 | Estimated On-Chip Power | **90 mW** |
