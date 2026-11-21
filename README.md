@@ -17,7 +17,7 @@ The SHA-256 compression engine consists of:
 - 64-round iterative compression datapath
 - Reusable single-round compression unit
 - 32-bit working registers `a` through `h`
-- 64-word message schedule
+- 64-word message schedule, supplied externally.
 - SHA-256 round constants
 - SHA-256 initial hash values
 - FSM-based control
@@ -52,7 +52,7 @@ The SHA-256 compression engine consists of:
 | Metric | Result |
 |---|---:|
 | Architecture | **64-round iterative SHA-256** |
-| Verification | **1,000 / 1,000 passed** |
+| Verification | **1,000 / 1,000 random test cases for the compression core passed** |
 | Pass Rate | **100%** |
 | LUTs | **1,346** |
 | Flip-Flops | **2,582** |
